@@ -6,7 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const graphql_1 = require("graphql");
+const schemaTypesBuilder_1 = require("./schemaTypesBuilder");
 const schemaClasses_1 = require("./schemaClasses");
+const typeBuilder = new schemaTypesBuilder_1.SchemaTypesBuilder();
 class SchemaBuilder {
     constructor() {
         this.models = new schemaClasses_1.Models();
@@ -62,6 +64,16 @@ class SchemaBuilder {
             }
         });
         this.models.addModel(typeNode);
+    }
+    printModelSchema(models) {
+        let modelString = '';
+        models.models.map((model) => {
+            modelString += `${typeBuilder.printType(model.name, fields)}`;
+        });
+        fs_1.default.writeFileSync(path_1.default.join(__dirname, "schema.graphql"), modelString);
+    }
+    generateSchema() {
+        return this.printModelSchema(this.models);
     }
     writeSchema() {
         this.parseDataModel();

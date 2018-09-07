@@ -2,8 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import { parse } from 'graphql';
 
+import { SchemaTypesBuilder } from './schemaTypesBuilder';
 import { Models, ModelTypeNode, Field } from './schemaClasses';
-import { DocumentType, DefinitionType, ModelFieldType, FieldType } from './types';
+import { DocumentType, DefinitionType, ModelFieldType, FieldType, ModelType } from './types';
+
+const typeBuilder = new SchemaTypesBuilder();
 
 export class SchemaBuilder {
   models: any
@@ -67,6 +70,22 @@ export class SchemaBuilder {
       }
     });
     this.models.addModel(typeNode);
+  }
+
+  private printModelSchema(models: Models): void {
+    let modelString = '';
+    models.models.map((model: ModelType) => {
+      modelString += `${typeBuilder.printType(model.name, fields)}`
+    });
+
+    fs.writeFileSync(
+      path.join(__dirname, "schema.graphql"),
+      modelString
+    );
+  }
+
+  public generateSchema(): void {
+    return this.printModelSchema(this.models);
   }
 
   public writeSchema(): any {
