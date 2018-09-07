@@ -8,6 +8,7 @@ const path_1 = __importDefault(require("path"));
 const graphql_1 = require("graphql");
 const schemaTypesBuilder_1 = require("./schemaTypesBuilder");
 const schemaClasses_1 = require("./schemaClasses");
+const constants_1 = require("./constants");
 const typeBuilder = new schemaTypesBuilder_1.SchemaTypesBuilder();
 class SchemaBuilder {
     constructor() {
@@ -66,10 +67,13 @@ class SchemaBuilder {
         this.models.addModel(typeNode);
     }
     printModelSchema(models) {
-        let modelString = '';
+        let aggregates = '';
+        let buildString = '';
         models.models.map((model) => {
-            modelString += `${typeBuilder.printType(model.name, fields)}`;
+            aggregates += `${typeBuilder.aggregateType(model)}`;
+            buildString += `${typeBuilder.printType(model.name, model.fields)}`;
         });
+        const modelString = `${aggregates}${constants_1.batchPayload}${buildString}`;
         fs_1.default.writeFileSync(path_1.default.join(__dirname, "schema.graphql"), modelString);
     }
     generateSchema() {
@@ -78,7 +82,7 @@ class SchemaBuilder {
     writeSchema() {
         this.parseDataModel();
         this.getModelTypes();
-        // return this.generateSchema();
+        return this.generateSchema();
     }
 }
 exports.SchemaBuilder = SchemaBuilder;

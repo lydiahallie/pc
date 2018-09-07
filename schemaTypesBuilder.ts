@@ -21,4 +21,13 @@ export class SchemaTypesBuilder {
       this.fieldGenerator.printTypeFields(fields)
     );
   }
+
+  public aggregateType(model: ModelType): string {
+    return this.inputType(
+      `Aggregate${model.name}`, 
+      '  count: Int!'
+    );
+  }
+
+
 }

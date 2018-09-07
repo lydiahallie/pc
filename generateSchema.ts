@@ -5,6 +5,7 @@ import { parse } from 'graphql';
 import { SchemaTypesBuilder } from './schemaTypesBuilder';
 import { Models, ModelTypeNode, Field } from './schemaClasses';
 import { DocumentType, DefinitionType, ModelFieldType, FieldType, ModelType } from './types';
+import { batchPayload } from './constants';
 
 const typeBuilder = new SchemaTypesBuilder();
 
@@ -73,10 +74,14 @@ export class SchemaBuilder {
   }
 
   private printModelSchema(models: Models): void {
-    let modelString = '';
+    let aggregates = '';
+    let buildString = '';
     models.models.map((model: ModelType) => {
-      modelString += `${typeBuilder.printType(model.name, fields)}`
+      aggregates += `${typeBuilder.aggregateType(model)}`;
+      buildString += `${typeBuilder.printType(model.name, model.fields)}`
     });
+
+    const modelString = `${aggregates}${batchPayload}${buildString}`
 
     fs.writeFileSync(
       path.join(__dirname, "schema.graphql"),
@@ -91,7 +96,7 @@ export class SchemaBuilder {
   public writeSchema(): any {
     this.parseDataModel();
     this.getModelTypes();
-    // return this.generateSchema();
+    return this.generateSchema();
   }
 }
 

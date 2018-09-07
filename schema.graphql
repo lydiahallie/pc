@@ -1,0 +1,13 @@
+type AggregateUser {
+  count: Int!
+}
+
+type BatchPayload {
+  count: Long!
+}
+type User implements Node {
+  id: ID
+  name: String
+  admin: Boolean
+}
+

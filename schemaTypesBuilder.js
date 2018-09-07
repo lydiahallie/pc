@@ -13,5 +13,8 @@ class SchemaTypesBuilder {
         const typeName = `${name} ${hasID ? 'implements Node' : ''}`;
         return this.inputType(typeName, this.fieldGenerator.printTypeFields(fields));
     }
+    aggregateType(model) {
+        return this.inputType(`Aggregate${model.name}`, '  count: Int!');
+    }
 }
 exports.SchemaTypesBuilder = SchemaTypesBuilder;
