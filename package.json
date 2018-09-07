@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "typescript": "^3.0.3"
+    "@types/node": "^10.9.4",
+    "graphql": "^14.0.2"
   }
 }
