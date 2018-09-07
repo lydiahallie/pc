@@ -34,3 +34,26 @@ export interface TypeType {
   type: NameType | TypeType
   loc: any
 }
+
+export interface ModelFieldType {
+  name: string 
+  value: string 
+  nullType: boolean
+  listType: boolean 
+  isUnique: boolean
+}
+
+
+export interface SchemaFieldType {
+  name: string 
+  value: string 
+  isList: boolean
+  fieldValueRequired: boolean 
+  fieldRequired: boolean
+}
+
+export interface ModelType {
+  name: string 
+  fields: SchemaFieldType[]
+}
+
