@@ -38,22 +38,27 @@ export interface TypeType {
 export interface ModelFieldType {
   name: string 
   value: string 
-  nullType: boolean
-  listType: boolean 
+  nonNullType: boolean
+  isListType: boolean 
   isUnique: boolean
 }
-
 
 export interface SchemaFieldType {
   name: string 
   value: string 
-  isList: boolean
+  isListType: boolean
   fieldValueRequired: boolean 
   fieldRequired: boolean
 }
 
 export interface ModelType {
   name: string 
-  fields: SchemaFieldType[]
+  fields: SchemaFieldType[] | ModelFieldType[]
 }
+
+export interface ModelsType {
+  models: ModelType[]
+}
+
+ 
 

@@ -14,17 +14,17 @@ class ModelTypeNode {
         this.name = name;
         this.fields = [];
     }
-    addField(fields) {
+    addFields(fields) {
         this.fields = fields;
     }
 }
 exports.ModelTypeNode = ModelTypeNode;
 class Field {
-    constructor(name, value, nullType, listType, isUnique) {
+    constructor(name, value, nonNullType, isListType, isUnique) {
         this.name = name;
         this.value = value;
-        this.nullType = nullType;
-        this.listType = listType;
+        this.nonNullType = nonNullType;
+        this.isListType = isListType;
         this.isUnique = isUnique;
     }
 }

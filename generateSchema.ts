@@ -1,25 +1,24 @@
 import fs from 'fs';
 import path from 'path';
 import { parse } from 'graphql';
-
 import { SchemaTypesBuilder } from './schemaTypesBuilder';
+import { DocumentType, DefinitionType, FieldType, NameType, TypeType, ModelType, ModelFieldType, ModelsType } from './types';
 import { Models, ModelTypeNode, Field } from './schemaClasses';
-import { DocumentType, DefinitionType, ModelFieldType, FieldType, ModelType } from './types';
-import { batchPayload } from './constants';
+import { enumType, interfaceType, pageInfoType } from './constants';
 
 const typeBuilder = new SchemaTypesBuilder();
 
 export class SchemaBuilder {
   models: any
-  
+
   constructor() {
-    this.models = new Models();;
+    this.models = new Models();
   }
 
-  public parseDataModel(): DocumentType {
+	public parseDataModel(): DocumentType {
     return parse(fs.readFileSync(path.join(__dirname, "datamodel.graphql"), "utf-8"));
   }
-
+  
   public getModelTypeNames(): Array<any> {
     let typeNames: Array<string> = ['Int', 'Boolean', 'String', 'Float', 'ID'];
     const definitions = this.parseDataModel().definitions;
@@ -29,12 +28,25 @@ export class SchemaBuilder {
     return typeNames;
   }
 
-  public getModelTypes(): void {
-    const definitions = this.parseDataModel().definitions;
-    
-    definitions.map(definition => {
-      this.getFieldProperties(definition);
+  private getFieldProperties(def: DefinitionType): void {
+    let fields: Array<ModelFieldType> = [];
+    const typeNode = new ModelTypeNode(def.name.value);
+
+    def.fields.map((field: FieldType) => {
+      const { type, directives } = field;
+      const nonNullType = type.kind === 'NonNullType';
+      const isListType = type.type && type.type.kind === 'ListType';
+      const isUnique = directives[0] && directives[0].name && directives[0].name.value === 'unique';
+      const value = this.getFieldValue(field, nonNullType, isListType);
+      const validFields = this.getModelTypeNames();
+
+      if (validFields.includes(value)) {
+        const name = field.name.value;
+        fields.push(new Field(name, value, nonNullType, isListType, isUnique));
+        typeNode.addFields(fields);
+      }
     });
+    this.models.addModel(typeNode);
   }
 
   private getFieldValue(field: any, isNonNullType: boolean, isListType: boolean): string {
@@ -50,39 +62,25 @@ export class SchemaBuilder {
     return value;
   }
 
-  private getFieldProperties(def: DefinitionType): void {
-    let fields: Array<ModelFieldType> = [];
-    const typeNode = new ModelTypeNode(def.name.value);
-
-    if (def.kind === 'ScalarTypeDefinition') return;
-
-    def.fields.map((field: FieldType) => {
-      const { type, directives } = field;
-      const nullType = type.kind === 'NonNullType';
-      const listType = type.type && type.type.kind === 'ListType';
-      const isUnique = directives[0] && directives[0].name && directives[0].name.value === 'unique';
-      const value = this.getFieldValue(field, nullType, listType);
-      const validFields = this.getModelTypeNames();
-
-      if (validFields.includes(value)) {
-        const name = field.name.value;
-        fields.push(new Field(name, value, nullType, listType, isUnique));
-        typeNode.addField(fields);
-      }
+  public getModelTypes(): void {
+    const definitions = this.parseDataModel().definitions;
+    
+    definitions.map(definition => {
+      this.getFieldProperties(definition);
     });
-    this.models.addModel(typeNode);
   }
 
-  private printModelSchema(models: Models): void {
-    let aggregates = '';
+  private printModelSchema(models: ModelsType): void {
+    let aggregates = ''
     let buildString = '';
     models.models.map((model: ModelType) => {
-      aggregates += `${typeBuilder.aggregateType(model)}`;
-      buildString += `${typeBuilder.printType(model.name, model.fields)}`
+      const fields = model.fields;
+      aggregates += `${typeBuilder.aggregateType(model)}`
+      buildString += `${typeBuilder.printType(model.name, fields)}${typeBuilder.printConnection(model)}${typeBuilder.createInput(model)}${typeBuilder.createEdge(model)}${typeBuilder.orderByInput(model)}${typeBuilder.previousValues(model)}${typeBuilder.subscriptionPayload(model)}${typeBuilder.subscriptionWhereInput(model)}${typeBuilder.updateInput(model)}${typeBuilder.modelWhereInput(model)}${typeBuilder.whereUniqueInput(model)}`
     });
-
-    const modelString = `${aggregates}${batchPayload}${buildString}`
-
+    const batchPayload = `type BatchPayload {\n  count: Long! \n}\n\n`
+    const modelString = `${aggregates}${batchPayload}${typeBuilder.mutationType(models.models)}\n${enumType}\n${interfaceType}\n${pageInfoType}\n${typeBuilder.queryType(models)}${typeBuilder.subscriptionType(models.models)}${buildString}`;
+    
     fs.writeFileSync(
       path.join(__dirname, "schema.graphql"),
       modelString
@@ -93,12 +91,12 @@ export class SchemaBuilder {
     return this.printModelSchema(this.models);
   }
 
-  public writeSchema(): any {
+  public writeSchema(): void {
     this.parseDataModel();
     this.getModelTypes();
     return this.generateSchema();
   }
 }
 
-const schemaBuilder = new SchemaBuilder();
-schemaBuilder.writeSchema();
+const builder = new SchemaBuilder;
+builder.writeSchema();

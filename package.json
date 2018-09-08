@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@types/node": "^10.9.4",
-    "graphql": "^14.0.2"
+    "graphql": "^14.0.2",
+    "pluralize": "^7.0.0"
   }
 }

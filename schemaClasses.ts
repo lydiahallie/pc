@@ -1,4 +1,4 @@
-import { ModelType,  ModelFieldType } from './types';
+import { ModelType, FieldType, ModelFieldType } from './types';
 
 export class Models {
   models: ModelType[]
@@ -14,14 +14,14 @@ export class Models {
 
 export class ModelTypeNode {
   name: string
-  fields: ModelFieldType[]
+  fields: ModelFieldType[] | string[]
 
 	constructor(name: string) {
 		this.name = name;
 		this.fields = [];
 	}
 
-	addField(fields: ModelFieldType[]) {
+	addFields(fields: ModelFieldType[] | string[]) {
     this.fields = fields
 	}
 }
@@ -29,15 +29,15 @@ export class ModelTypeNode {
 export class Field {
   name: string
   value: string
-  nullType: boolean
-  listType: boolean
+  nonNullType: boolean
+  isListType: boolean
   isUnique: boolean
 
-	constructor(name: string, value: string, nullType: boolean, listType: boolean, isUnique: boolean) {
+	constructor(name: string, value: string, nonNullType: boolean, isListType: boolean, isUnique: boolean) {
 		this.name = name;
 		this.value = value;
-		this.nullType = nullType;
-		this.listType = listType;
+		this.nonNullType = nonNullType;
+		this.isListType = isListType;
     this.isUnique = isUnique;
 	}
 }
