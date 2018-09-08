@@ -49,7 +49,7 @@ export class SchemaBuilder {
     this.models.addModel(typeNode);
   }
 
-  private getFieldValue(field: any, isNonNullType: boolean, isListType: boolean): string {
+  private getFieldValue(field: FieldType, isNonNullType: boolean, isListType: boolean): string {
     let value;
     const fieldValue = field.type.type;
     if (isListType) {
