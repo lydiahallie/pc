@@ -34,15 +34,6 @@ export interface TypeType {
   type: NameType | TypeType
   loc: any
 }
-
-export interface ModelFieldType {
-  name: string 
-  value: string 
-  nonNullType: boolean
-  isListType: boolean 
-  isUnique: boolean
-}
-
 export interface SchemaFieldType {
   name: string 
   value: string 
@@ -53,7 +44,7 @@ export interface SchemaFieldType {
 
 export interface ModelType {
   name: string 
-  fields: SchemaFieldType[] | ModelFieldType[]
+  fields: SchemaFieldType[]
 }
 
 export interface ModelsType {

@@ -1,4 +1,4 @@
-import { ModelType, FieldType, ModelFieldType } from './types';
+import { ModelType, SchemaFieldType } from './types';
 
 export class Models {
   models: ModelType[]
@@ -12,32 +12,46 @@ export class Models {
   }
 }
 
+export class CustomScalarNodes {
+	customScalars: Array<string>
+
+	constructor() {
+		this.customScalars = [];
+	}
+
+	addCustomScalar(scalar: string) {
+		this.customScalars.push(scalar)
+	}
+}
+
 export class ModelTypeNode {
   name: string
-  fields: ModelFieldType[] | string[]
+  fields?: SchemaFieldType[] | string[]
 
   constructor(name: string) {
     this.name = name;
     this.fields = [];
   }
 
-  addFields(fields: ModelFieldType[] | string[]) {
-    this.fields = fields
+  addFields(fields: SchemaFieldType[] | string[]) {
+    this.fields = fields;
   }
 }
 
 export class Field {
-  name: string
-  value: string
-  nonNullType: boolean
+	name: string 
+  value: string 
   isListType: boolean
-  isUnique: boolean
+  fieldValueRequired: boolean 
+	fieldRequired: boolean
+	isUnique: boolean
 
-  constructor(name: string, value: string, nonNullType: boolean, isListType: boolean, isUnique: boolean) {
+  constructor(name: string, value: string, isListType: boolean, fieldValueRequired: boolean, fieldRequired: boolean, isUnique: boolean) {
     this.name = name;
     this.value = value;
-    this.nonNullType = nonNullType;
     this.isListType = isListType;
-    this.isUnique = isUnique;
+    this.fieldValueRequired = fieldValueRequired;
+		this.fieldRequired = fieldRequired;
+		this.isUnique = isUnique;
   }
 }

@@ -1,15 +1,15 @@
-import { SchemaFieldType, ModelType, ModelFieldType } from './types';
+import { SchemaFieldType, ModelType } from './types';
 import pluralize from 'pluralize';
 import { mutationValues , subscriptionValues, subscriptionFieldValues, whereInputFields } from './constants';
 
 export class SchemaFieldGenerator {
 
-  public generateSchemaField(field: ModelFieldType): string {
-    const { name, isListType, value, nonNullType } = field;
-    return `  ${name}: ${isListType ? '[' : ''}${value}${nonNullType ? '!' : ''}${isListType ? ']' : ''}`;
+  public generateSchemaField(field: SchemaFieldType): string {
+    const { name, value, isListType, fieldValueRequired, fieldRequired } = field;
+		return  `  ${name}: ${isListType ? '[' : ''}${value}${fieldValueRequired ? '!' : ''}${isListType ? ']' : ''}${fieldRequired ? '!' : ''}`;
   }
 
-  public subscriptionPayloadFields(model: ModelType) {
+  public subscriptionPayloadFields(model: ModelType): string {
     return subscriptionValues(model);
   }
 
@@ -33,41 +33,41 @@ export class SchemaFieldGenerator {
     }
   }
 
-  public printTypeFields(fields: SchemaFieldType[]) {
-    return fields.map((field: SchemaFieldType) => this.generateSchemaField(field)).join('\n')
+  public printTypeFields(fields: SchemaFieldType[]): string {
+		return fields.map((field: SchemaFieldType) => this.generateSchemaField(field)).join('\n');
   }
 
-  public generateMutationFields(model: ModelType[]) {  
-    const printFields = (value, i) => {
-      return model.map(type => {
-        return this.generateMutationSchemaField(value, type)
+  public generateMutationFields(model: SchemaFieldType[]): string {  
+    const printFields = (value: string) => {
+      return model.map((type: SchemaFieldType) => {
+        return this.generateMutationSchemaField(value, type);
       }).join('\n');
     }
 
-    return mutationValues.map((value, i) => printFields(value, i)).join('\n');
+    return mutationValues.map((value: string) => printFields(value)).join('\n');
   }
 
-  public generateUniqueInputFields(model: ModelType) {
-    const values = model.fields.filter(field => field.isUnique || field.name === 'id')
-    return values.map(value => `  ${value.name}: ${value.value}`).join('\n')
+  public generateUniqueInputFields(model: ModelType): string {
+    const values = model.fields.filter((field: SchemaFieldType) => field.isUnique || field.name === 'id');
+    return values.map(value => `  ${value.name}: ${value.value}`).join('\n');
   }
 
-  public generateSubcriptionFields(model: ModelType) {
+  public generateSubcriptionFields(model: ModelType): string {
     const values = subscriptionFieldValues(model);
-    return values.map(value => `  ${value.name}: ${value.value}`).join('\n')
+    return values.map(value => `  ${value.name}: ${value.value}`).join('\n');
   }
 
-  public generateSubscriptionTypeFields(models: ModelType[]) {
+  public generateSubscriptionTypeFields(models: ModelType[]): string {
     function printFields(model: ModelType) {
       const { name } = model;
-      return `  ${name.toLowerCase()}(where: ${name}SubscriptionWhereInput): ${name}SubscriptionPayload`
+      return `  ${name.toLowerCase()}(where: ${name}SubscriptionWhereInput): ${name}SubscriptionPayload`;
     }
-    return models.map(model => printFields(model)).join('\n')
+    return models.map((model: ModelType) => printFields(model)).join('\n');
   }
 
-  public printInputTypeFields(fields: ModelFieldType[]) {
+  public printInputTypeFields(fields: SchemaFieldType[]): string {
     const uniqueFields = fields.filter(field => !field.isUnique || !field.name === "id");
-    return uniqueFields.map(field => `  ${field.name}: ${field.value}`).join('\n');
+    return uniqueFields.map((field: SchemaFieldType) => `  ${field.name}: ${field.value}`).join('\n');
   }
 
   public generateQueryFields(models: ModelType[]): string {
@@ -86,11 +86,11 @@ export class SchemaFieldGenerator {
     })
 
     models.map((model: ModelType) => {
-      if (model.fields.some(field => field.isUnique || field.name === 'id')) {
+      if (model.fields.some((field: SchemaFieldType) => field.isUnique || field.name === 'id')) {
         queryString += `${printQuery('single', model.name)}\n`
       }
-    })
-    
+		})
+		    
     return queryString;
   }
 
@@ -107,7 +107,7 @@ export class SchemaFieldGenerator {
     return `  AND: [${model.name}WhereInput!]\n  OR: [${model.name}WhereInput!]\n  NOT: [${model.name}WhereInput!]\n${model.fields.map(field => printInputFields(field)).join('\n')}`
   }
 
-  public orderEnumFields(model: ModelType) {
+  public orderEnumFields(model: ModelType): string {
     return model.fields.map((field: SchemaFieldType) => `  ${field.name}_ASC\n  ${field.name}_DESC`).join('\n')
   }
 }

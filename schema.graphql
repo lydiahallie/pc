@@ -2,6 +2,10 @@ type AggregateUser {
   count: Int!
 }
 
+scalar DateTime
+
+scalar Long
+
 type BatchPayload {
   count: Long! 
 }
@@ -45,8 +49,10 @@ type Subscription {
 
 type User implements Node {
   id: ID!
-  name: String!
+  createdAt: DateTime!
+  name: String
   admin: Boolean!
+  test: [Int]!
 }
 
 type UserConnection {
@@ -57,8 +63,10 @@ type UserConnection {
 
 type UserCreateInput {
   id: ID!
-  name: String!
+  createdAt: DateTime!
+  name: String
   admin: Boolean!
+  test: [Int]!
 }
 
 type UserEdge {
@@ -69,16 +77,22 @@ type UserEdge {
 enum UserOrderByInput {
   id_ASC
   id_DESC
+  createdAt_ASC
+  createdAt_DESC
   name_ASC
   name_DESC
   admin_ASC
   admin_DESC
+  test_ASC
+  test_DESC
 }
 
 type UserPreviousValues {
   id: ID!
-  name: String!
+  createdAt: DateTime!
+  name: String
   admin: Boolean!
+  test: [Int]!
 }
 
 type UserSubscriptionPayload {
@@ -100,8 +114,10 @@ input UserSubscriptionWhereInput {
 }
 
 type UserUpdateInput {
+  createdAt: DateTime
   name: String
   admin: Boolean
+  test: Int
 }
 
 input UserWhereInput {
@@ -121,6 +137,13 @@ input UserWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
   name_not: String
   name_in: [String!]
   name_not_in: [String!]
@@ -135,6 +158,13 @@ input UserWhereInput {
   name_ends_with: String
   name_not_ends_with: String
   admin_not: Boolean
+  test_not: Int
+  test_in: [Int!]
+  test_not_in: [Int!]
+  test_lt: Int
+  test_lte: Int
+  test_gt: Int
+  test_gte: Int
 }
 
 input UserWhereUniqueInput {

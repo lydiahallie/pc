@@ -1,5 +1,5 @@
 import { SchemaFieldGenerator } from './schemaFieldGenerator';
-import { SchemaFieldType, FieldType, ModelType, ModelsType, ModelFieldType } from './types';
+import { SchemaFieldType,  ModelType, ModelsType } from './types';
 
 export class SchemaTypesBuilder {
   fieldGenerator: any
@@ -28,9 +28,9 @@ export class SchemaTypesBuilder {
     return `  pageInfo: PageInfo!\n  edges: [${model.name}Edge]! \n  aggregate: Aggregate${model.name}!`
   }
 
-  public printType(name: string, fields: SchemaFieldType[] | ModelFieldType[] | string[]): string {
-    const hasID = fields.some((field: FieldType) => field.name === 'id');
-    const typeName = `${name} ${hasID ? 'implements Node' : ''}`;
+  public printType(name: string, fields: SchemaFieldType[] | string[]): string {
+    const hasID = fields.some((field: SchemaFieldType) => field.name === 'id');
+		const typeName = `${name} ${hasID ? 'implements Node' : ''}`;
     return this.inputType(
       typeName,
       this.fieldGenerator.printTypeFields(fields)
